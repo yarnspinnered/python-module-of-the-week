@@ -134,3 +134,36 @@ t1.start()
 t2.start()
 t1.join()
 t2.join()
+
+# limit number of workers using a resource
+
+class ActivePool:
+    def __init__(self):
+        self.active = []
+        self.lock = threading.Lock()
+
+    def make_active(self, name):
+        self.active.append(name)
+        logging.debug("After adding. Running: %s",self.active)
+
+    def make_inactive(self, name):
+        self.active.remove(name)
+        logging.debug("After removal, running: %s", self.active)
+
+def worker(s, pool):
+    logging.debug("waiting to join pool")
+    with s:
+        name = threading.current_thread().getName()
+        pool.make_active(name)
+        time.sleep(0.1)
+        pool.make_inactive(name)
+
+pool = ActivePool()
+semaphore = threading.Semaphore(2)
+for i in range(5):
+    t = threading.Thread(
+        name="Worker {}".format(i),
+        target=worker,
+        args=(semaphore, pool)
+    )
+    t.start()
