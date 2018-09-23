@@ -30,7 +30,11 @@ def test_patterns(text, patterns):
 #. is a wildcard
 #Escape codes. \d : digit \D non-digit \s space (incl tab) \S nonspace \w alphanumeric \W non-alphanumeric
 # Anchoring. ^ : Start, $: end, \A start of string, \Z endo f string, \b empty string at beginning or end of word,
-
+# Groups of characters. Use match_object.groups() to access and parenthesis to indicate groups.
+#Use the flag re.IGNORECASE to ignore case or re.MULTILINE for anchors to work on multiple lines
+# Use (?=) for positive lookahead and (?!) for negative look ahead. They are assertions that dont consume characters
+# In search, if the first match (ignoring the assertion) does not meet the assertion, it fails completely.
+# When assertiong, findall still tries all possible positions
 match = re.search("this", "is this in this?")
 print("The first match goes from {} to {}".format(match.start(), match.end()))
 
@@ -168,8 +172,8 @@ address = re.compile(
 
 candidates = [
     u'first.last@example.com',
-    u'noreply@example.com second@example.com',
+    u'second@example.com noreply@example.com',
 ]
 for t in candidates:
-    print(t, ": " , address.match(t))
+    print(t, ": " , address.findall(t))
 
