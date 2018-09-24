@@ -86,13 +86,17 @@ class Counter:
 
 c = Counter()
 def incr_counter(c):
-    while c.c < 30:
-        time.sleep(0.1)
-        c.increment()
-        logging.debug("{} Current count after incrementing is: {}".format(threading.current_thread(), c.c))
-
-t1 = threading.Thread(target=incr_counter, args=(c,))
-t2 = threading.Thread(target=incr_counter, args=(c,))
+    logging.debug('{} has started'.format(threading.current_thread()))
+    while True:
+        time.sleep(0.5)
+        with c.lock:
+            if c.c < 30:
+                c.increment()
+                logging.debug("{} Current count after incrementing is: {}".format(threading.current_thread(), c.c))
+            else:
+                break
+t1 = threading.Thread(target=incr_counter, args=(c,), daemon=True)
+t2 = threading.Thread(target=incr_counter, args=(c,), daemon=True)
 t1.start()
 t2.start()
 t1.join()
